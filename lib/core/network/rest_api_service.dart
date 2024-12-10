@@ -1,67 +1,169 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:dio/dio.dart' as d;
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 
-import 'header_manager.dart';
+import '../dependencies/header_manager.dart';
+import '../environments/environment.dart';
+import 'response_data_type_enum.dart';
+import 'rest_api_response_model.dart';
+import 'upload_file_type_enum.dart';
 
 class RestApiService {
+  final url = Environment.env.url;
   final HeaderManager _headerManager = GetIt.instance<HeaderManager>();
 
   Map<String, String> getHeaders() {
     return _headerManager.headers;
   }
 
-  Future<http.Response> get(String url, {Map<String, String>? queryParams}) async {
-    final uri = Uri.parse(url).replace(queryParameters: queryParams);
+  Future<RestApiResponse> get(
+    String route, {
+    Map<String, String>? queryParams,
+    ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
+  }) async {
+    final uri = Uri.parse("$url$route").replace(queryParameters: queryParams);
     final response = await http.get(uri, headers: getHeaders());
-    _checkResponse(response);
-    return response;
+    return _checkHttpResponse(response, responseDataType);
   }
 
-  Future<http.Response> post(String url, {Map<String, String>? body}) async {
+  Future<RestApiResponse> post(
+    String route, {
+    Map<String, String>? body,
+    ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
+  }) async {
     final response = await http.post(
-      Uri.parse(url),
+      Uri.parse("$url$route"),
       headers: getHeaders(),
       body: jsonEncode(body),
     );
-    _checkResponse(response);
-    return response;
+    return _checkHttpResponse(response, responseDataType);
   }
 
-  Future<http.Response> put(String url, {Map<String, String>? body}) async {
+  Future<RestApiResponse> put(
+    String route, {
+    Map<String, String>? body,
+    ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
+  }) async {
     final response = await http.put(
-      Uri.parse(url),
+      Uri.parse("$url$route"),
       headers: getHeaders(),
       body: jsonEncode(body),
     );
-    _checkResponse(response);
-    return response;
+    return _checkHttpResponse(response, responseDataType);
   }
 
-  Future<http.Response> patch(String url, {Map<String, String>? body}) async {
+  Future<RestApiResponse> patch(
+    String route, {
+    Map<String, String>? body,
+    ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
+  }) async {
     final response = await http.patch(
-      Uri.parse(url),
+      Uri.parse("$url$route"),
       headers: getHeaders(),
       body: jsonEncode(body),
     );
-    _checkResponse(response);
-    return response;
+    return _checkHttpResponse(response, responseDataType);
   }
 
-  Future<http.Response> delete(String url, {Map<String, String>? body}) async {
+  Future<RestApiResponse> delete(
+    String route, {
+    Map<String, String>? body,
+    ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
+  }) async {
     final response = await http.delete(
-      Uri.parse(url),
+      Uri.parse("$url$route"),
       headers: getHeaders(),
       body: body != null ? jsonEncode(body) : null,
     );
-    _checkResponse(response);
-    return response;
+    return _checkHttpResponse(response, responseDataType);
   }
 
-  void _checkResponse(http.Response response) {
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw Exception('HTTP Error: ${response.statusCode} ${response.body}');
+  Future<RestApiResponse> postFile(
+    String route,
+    String destination,
+    UploadFileType type,
+    int? id,
+    File file, {
+    ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
+  }) async {
+    final formData = d.FormData.fromMap(
+      {
+        'destination': destination,
+        'type': type.value,
+        'id': id,
+        'thumbnailSize': 350,
+      },
+    );
+
+    final options = d.BaseOptions(connectTimeout: const Duration(seconds: 30));
+    final dio = d.Dio(options);
+
+    formData.files.add(
+      MapEntry(
+        'file',
+        await d.MultipartFile.fromFile(
+          file.path,
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      ),
+    );
+
+    final response = await dio.post("$url$route", data: formData, options: d.Options(headers: getHeaders()));
+
+    return _checkDioResponse(response, responseDataType);
+  }
+
+  RestApiResponse _checkHttpResponse(http.Response response, ResponseDataTypeEnum dataType) {
+    if (response.statusCode != HttpStatus.ok &&
+        response.statusCode != HttpStatus.created &&
+        response.statusCode != HttpStatus.accepted) {
+      return RestApiResponse(
+        null,
+        message: 'HTTP Error: ${response.statusCode} ${response.body}',
+        isSuccess: false,
+      );
     }
+
+    dynamic data;
+    switch (dataType) {
+      case ResponseDataTypeEnum.json:
+        data = json.decode(response.body);
+        break;
+      case ResponseDataTypeEnum.boolean:
+      case ResponseDataTypeEnum.string:
+        data = response.body;
+        break;
+    }
+
+    return RestApiResponse(data);
+  }
+
+  RestApiResponse _checkDioResponse(d.Response response, ResponseDataTypeEnum dataType) {
+    if (response.statusCode != HttpStatus.ok &&
+        response.statusCode != HttpStatus.created &&
+        response.statusCode != HttpStatus.accepted) {
+      return RestApiResponse(
+        null,
+        message: 'HTTP Error: ${response.statusCode} ${response.data}',
+        isSuccess: false,
+      );
+    }
+
+    dynamic data;
+    switch (dataType) {
+      case ResponseDataTypeEnum.json:
+        data = json.decode(response.data);
+        break;
+      case ResponseDataTypeEnum.boolean:
+      case ResponseDataTypeEnum.string:
+        data = response.data;
+        break;
+    }
+
+    return RestApiResponse(data);
   }
 }

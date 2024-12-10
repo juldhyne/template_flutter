@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 
-import '../network/header_manager.dart';
+import 'header_manager.dart';
 
 final getIt = GetIt.instance;
 
