@@ -9,6 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  get_it: ^8.0.2
+  http: ^1.2.2
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:

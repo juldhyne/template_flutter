@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-void main() {
+import 'core/dependencies/dependencies.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Setup dependencies
+  await setupDependencies();
+
   runApp(const MainApp());
 }
 
