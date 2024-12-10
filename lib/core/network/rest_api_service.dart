@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart' as d;
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -25,9 +27,13 @@ class RestApiService {
     Map<String, String>? queryParams,
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
-    final uri = Uri.parse("$url$route").replace(queryParameters: queryParams);
-    final response = await http.get(uri, headers: getHeaders());
-    return _checkHttpResponse(response, responseDataType);
+    try {
+      final uri = Uri.parse("$url$route").replace(queryParameters: queryParams);
+      final response = await http.get(uri, headers: getHeaders());
+      return _checkHttpResponse(response, responseDataType);
+    } catch (e) {
+      return _handleError(e);
+    }
   }
 
   Future<RestApiResponse> post(
@@ -35,12 +41,16 @@ class RestApiService {
     Map<String, String>? body,
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
-    final response = await http.post(
-      Uri.parse("$url$route"),
-      headers: getHeaders(),
-      body: jsonEncode(body),
-    );
-    return _checkHttpResponse(response, responseDataType);
+    try {
+      final response = await http.post(
+        Uri.parse("$url$route"),
+        headers: getHeaders(),
+        body: jsonEncode(body),
+      );
+      return _checkHttpResponse(response, responseDataType);
+    } catch (e) {
+      return _handleError(e);
+    }
   }
 
   Future<RestApiResponse> put(
@@ -48,12 +58,16 @@ class RestApiService {
     Map<String, String>? body,
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
-    final response = await http.put(
-      Uri.parse("$url$route"),
-      headers: getHeaders(),
-      body: jsonEncode(body),
-    );
-    return _checkHttpResponse(response, responseDataType);
+    try {
+      final response = await http.put(
+        Uri.parse("$url$route"),
+        headers: getHeaders(),
+        body: jsonEncode(body),
+      );
+      return _checkHttpResponse(response, responseDataType);
+    } catch (e) {
+      return _handleError(e);
+    }
   }
 
   Future<RestApiResponse> patch(
@@ -61,12 +75,16 @@ class RestApiService {
     Map<String, String>? body,
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
-    final response = await http.patch(
-      Uri.parse("$url$route"),
-      headers: getHeaders(),
-      body: jsonEncode(body),
-    );
-    return _checkHttpResponse(response, responseDataType);
+    try {
+      final response = await http.patch(
+        Uri.parse("$url$route"),
+        headers: getHeaders(),
+        body: jsonEncode(body),
+      );
+      return _checkHttpResponse(response, responseDataType);
+    } catch (e) {
+      return _handleError(e);
+    }
   }
 
   Future<RestApiResponse> delete(
@@ -74,12 +92,16 @@ class RestApiService {
     Map<String, String>? body,
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
-    final response = await http.delete(
-      Uri.parse("$url$route"),
-      headers: getHeaders(),
-      body: body != null ? jsonEncode(body) : null,
-    );
-    return _checkHttpResponse(response, responseDataType);
+    try {
+      final response = await http.delete(
+        Uri.parse("$url$route"),
+        headers: getHeaders(),
+        body: body != null ? jsonEncode(body) : null,
+      );
+      return _checkHttpResponse(response, responseDataType);
+    } catch (e) {
+      return _handleError(e);
+    }
   }
 
   Future<RestApiResponse> postFile(
@@ -90,31 +112,35 @@ class RestApiService {
     File file, {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
-    final formData = d.FormData.fromMap(
-      {
-        'destination': destination,
-        'type': type.value,
-        'id': id,
-        'thumbnailSize': 350,
-      },
-    );
+    try {
+      final formData = d.FormData.fromMap(
+        {
+          'destination': destination,
+          'type': type.value,
+          'id': id,
+          'thumbnailSize': 350,
+        },
+      );
 
-    final options = d.BaseOptions(connectTimeout: const Duration(seconds: 30));
-    final dio = d.Dio(options);
+      final options = d.BaseOptions(connectTimeout: const Duration(seconds: 30));
+      final dio = d.Dio(options);
 
-    formData.files.add(
-      MapEntry(
-        'file',
-        await d.MultipartFile.fromFile(
-          file.path,
-          contentType: MediaType('image', 'jpeg'),
+      formData.files.add(
+        MapEntry(
+          'file',
+          await d.MultipartFile.fromFile(
+            file.path,
+            contentType: MediaType('image', 'jpeg'),
+          ),
         ),
-      ),
-    );
+      );
 
-    final response = await dio.post("$url$route", data: formData, options: d.Options(headers: getHeaders()));
+      final response = await dio.post("$url$route", data: formData, options: d.Options(headers: getHeaders()));
 
-    return _checkDioResponse(response, responseDataType);
+      return _checkDioResponse(response, responseDataType);
+    } catch (e) {
+      return _handleError(e);
+    }
   }
 
   RestApiResponse _checkHttpResponse(http.Response response, ResponseDataTypeEnum dataType) {
@@ -165,5 +191,26 @@ class RestApiService {
     }
 
     return RestApiResponse(data);
+  }
+
+  RestApiResponse _handleError(Object error) {
+    if (error is SocketException) {
+      //treat SocketException
+      if (kDebugMode) {
+        print("Socket exception: ${error.toString()}");
+      }
+      return const RestApiResponse(null, message: "No Internet", isSuccess: false);
+    } else if (error is TimeoutException) {
+      //treat TimeoutException
+      if (kDebugMode) {
+        print("Timeout exception: ${error.toString()}");
+      }
+      return const RestApiResponse(null, message: "Response too slow", isSuccess: false);
+    } else {
+      if (kDebugMode) {
+        print("Unhandled exception: ${error.toString()}");
+      }
+      return const RestApiResponse(null, message: "Unknown error. Contact support", isSuccess: false);
+    }
   }
 }
