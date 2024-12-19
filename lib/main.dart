@@ -28,8 +28,6 @@ Future<void> main() async {
  * Notifications
  * Backend calls
  * Errors
- * Versions
- * Authentication
  * Dark mode
  * Snackbars
  * Images

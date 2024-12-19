@@ -5,6 +5,7 @@ import 'package:formz/formz.dart';
 import '../../../main.dart';
 import '../../authentication/authentication_repository.dart';
 import '../../signup/presentation/signup_view.dart';
+import '../../version_checker/cubit/version_checker_cubit.dart';
 import '../bloc/login_bloc.dart';
 
 class LoginView extends StatelessWidget {
@@ -57,6 +58,10 @@ class LoginForm extends StatelessWidget {
             _LoginButton(),
             const Padding(padding: EdgeInsets.all(12)),
             _SignupRedirectionButton(),
+            const Spacer(),
+            if (context.read<VersionCheckerCubit>().state is VersionCheckerAccepted)
+              Text(
+                  "Version ${(context.read<VersionCheckerCubit>().state as VersionCheckerAccepted).packageInfo.version}")
           ],
         ),
       ),

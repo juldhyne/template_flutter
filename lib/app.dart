@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:template_flutter/modules/version_checker/cubit/version_checker_cubit.dart';
+import 'package:template_flutter/modules/version_checker/datasources/version_checker_datasource.dart';
+import 'package:template_flutter/modules/version_checker/version_checker_repository.dart';
 
 import 'main.dart';
 import 'modules/authentication/authentication_repository.dart';
@@ -19,6 +22,7 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   late final AuthenticationRepository _authenticationRepository;
+  late final VersionCheckerRepository _versionCheckerRepository;
 
   @override
   void initState() {
@@ -26,6 +30,9 @@ class _MainAppState extends State<MainApp> {
     _authenticationRepository = AuthenticationRepository(
       authenticationDatasource: AuthenticationDatasource(),
       sharedPreferencesDatasource: SharedPreferencesDatasource(),
+    );
+    _versionCheckerRepository = VersionCheckerRepository(
+      versionCheckerDatasource: VersionCheckerDatasource(),
     );
   }
 
@@ -39,34 +46,85 @@ class _MainAppState extends State<MainApp> {
   Widget build(BuildContext context) {
     return RepositoryProvider.value(
       value: _authenticationRepository,
-      child: BlocProvider(
-        lazy: false,
-        create: (_) => AuthenticationBloc(
-          authenticationRepository: _authenticationRepository,
-        )..add(AuthenticationSubscriptionRequested()),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            lazy: false,
+            create: (_) => AuthenticationBloc(
+              authenticationRepository: _authenticationRepository,
+            ),
+          ),
+          BlocProvider(
+            create: (_) => VersionCheckerCubit(
+              versionCheckerRepository: _versionCheckerRepository,
+            )..checkAppVersion(), // Initialize validation
+          ),
+        ],
         child: MaterialApp(
           navigatorKey: navigatorKey,
           builder: (context, child) {
-            return BlocListener<AuthenticationBloc, AuthenticationState>(
-              // Avoid redirection when overriding authenticated user on user update
-              listenWhen: (previous, current) => previous.status != current.status,
+            return BlocListener<VersionCheckerCubit, VersionCheckerState>(
               listener: (context, state) {
-                switch (state.status) {
-                  case AuthenticationStatus.authenticated:
-                    navigatorKey.currentState?.pushAndRemoveUntil<void>(
-                      HomeView.route(),
-                      (route) => false,
-                    );
-                  case AuthenticationStatus.unauthenticated:
-                    navigatorKey.currentState?.pushAndRemoveUntil<void>(
-                      LoginView.route(),
-                      (route) => false,
-                    );
-                  case AuthenticationStatus.initial:
-                    break;
+                if (state is VersionCheckerAccepted) {
+                  context.read<AuthenticationBloc>().add(AuthenticationSubscriptionRequested());
+                }
+                if (state is VersionCheckerDenied) {
+                  // Show the modal dialog if validation fails
+                  showDialog(
+                    context: navigatorKey.currentState!.overlay!.context,
+                    barrierDismissible: false, // Prevent dismissing by tapping outside
+                    builder: (_) => const AlertDialog(
+                      title: Text('App deprecated'),
+                      content: Text('Your app is deprecated and requires latest updates to be used. Please update it.'),
+                      actions: [], // No actions to prevent dismissal
+                    ),
+                  );
+                }
+                if (state is VersionCheckerFailure) {
+                  // Show the modal dialog if validation fails
+                  showDialog(
+                    context: navigatorKey.currentState!.overlay!.context,
+                    barrierDismissible: false, // Prevent dismissing by tapping outside
+                    builder: (_) => AlertDialog(
+                      title: const Text('Error message'),
+                      content: Text(state.error.message),
+                      actions: [
+                        TextButton(
+                          child: const Text('Refresh'),
+                          onPressed: () => context.read<VersionCheckerCubit>().checkAppVersion(),
+                        )
+                      ], // No actions to prevent dismissal
+                    ),
+                  );
+                }
+                if (state is VersionCheckerLoading) {
+                  // Ensure the dialog is dismissed when refreshing starts
+                  if (Navigator.canPop(navigatorKey.currentState!.context)) {
+                    Navigator.pop(navigatorKey.currentState!.context);
+                  }
                 }
               },
-              child: child,
+              child: BlocListener<AuthenticationBloc, AuthenticationState>(
+                // Avoid redirection when overriding authenticated user on user update
+                listenWhen: (previous, current) => previous.status != current.status,
+                listener: (context, state) {
+                  switch (state.status) {
+                    case AuthenticationStatus.authenticated:
+                      navigatorKey.currentState?.pushAndRemoveUntil<void>(
+                        HomeView.route(),
+                        (route) => false,
+                      );
+                    case AuthenticationStatus.unauthenticated:
+                      navigatorKey.currentState?.pushAndRemoveUntil<void>(
+                        LoginView.route(),
+                        (route) => false,
+                      );
+                    case AuthenticationStatus.initial:
+                      break;
+                  }
+                },
+                child: child,
+              ),
             );
           },
           onGenerateRoute: (_) => SplashScreen.route(),
