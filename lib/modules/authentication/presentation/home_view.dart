@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../update_user/presentation/update_user_button_widget.dart';
+import '../../../main.dart';
+import '../../update_user/presentation/update_user_view.dart';
 import '../bloc/authentication_bloc.dart';
 
 class HomeView extends StatelessWidget {
@@ -19,10 +20,25 @@ class HomeView extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _UserId(),
-            UpdateUserButtonWidget(),
+            _UpdateUserRedirectionButton(),
             _LogoutButton(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _UpdateUserRedirectionButton extends StatelessWidget {
+  const _UpdateUserRedirectionButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: const Text('Update user'),
+      onPressed: () => navigatorKey.currentState?.pushAndRemoveUntil<void>(
+        UpdateUserView.route(),
+        (route) => false,
       ),
     );
   }

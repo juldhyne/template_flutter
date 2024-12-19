@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
+import '../../../core/errors/errors.dart';
 import '../../../models/email_field_model.dart';
 import '../../../models/firstname_field_model.dart';
 import '../../../models/lastname_field_model.dart';
@@ -36,7 +37,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     SignupEmailChanged event,
     Emitter<SignupState> emit,
   ) {
-    print('[SignupBloc]: _onEmailChanged()');
+    print('[SignupBloc]: _onEmailChanged');
     final email = Email.dirty(event.email);
     emit(
       state.copyWith(
@@ -52,7 +53,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     SignupPasswordChanged event,
     Emitter<SignupState> emit,
   ) {
-    print('[SignupBloc]: _onPasswordChanged()');
+    print('[SignupBloc]: _onPasswordChanged');
     final password = Password.dirty(event.password);
     emit(
       state.copyWith(
@@ -68,7 +69,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     SignupFirstnameChanged event,
     Emitter<SignupState> emit,
   ) {
-    print('[SignupBloc]: _onFirstnameChanged()');
+    print('[SignupBloc]: _onFirstnameChanged');
     final firstname = Firstname.dirty(event.firstname);
     emit(
       state.copyWith(
@@ -84,7 +85,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     SignupLastnameChanged event,
     Emitter<SignupState> emit,
   ) {
-    print('[SignupBloc]: _onLastnameChanged()');
+    print('[SignupBloc]: _onLastnameChanged');
     final lastname = Lastname.dirty(event.lastname);
     emit(
       state.copyWith(
@@ -101,20 +102,20 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     SignupSubmitted event,
     Emitter<SignupState> emit,
   ) async {
-    print('[SignupBloc]: _onSubmitted()');
+    print('[SignupBloc]: _onSubmitted');
     if (state.isValid) {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-      try {
-        await _authenticationRepository.signup(
-          email: state.email.value,
-          password: state.password.value,
-          firstname: state.firstname.value,
-          lastname: state.lastname.value,
-        );
-        emit(state.copyWith(status: FormzSubmissionStatus.success));
-      } catch (_) {
-        emit(state.copyWith(status: FormzSubmissionStatus.failure));
-      }
+
+      final result = await _authenticationRepository.signup(
+        email: state.email.value,
+        password: state.password.value,
+        firstname: state.firstname.value,
+        lastname: state.lastname.value,
+      );
+      result.fold(
+        (error) => emit(state.copyWith(status: FormzSubmissionStatus.failure, error: error)),
+        (_) => emit(state.copyWith(status: FormzSubmissionStatus.success)),
+      );
     }
   }
 }

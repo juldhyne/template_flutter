@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
+import '../../../core/errors/errors.dart';
 import '../../../models/firstname_field_model.dart';
 import '../../../models/lastname_field_model.dart';
 import '../../authentication/authentication_repository.dart';
@@ -31,7 +32,7 @@ class UpdateUserBloc extends Bloc<UpdateUserEvent, UpdateUserState> {
     UpdateUserFirstnameChanged event,
     Emitter<UpdateUserState> emit,
   ) {
-    print('[UpdateUserBloc]: _onFirstnameChanged()');
+    print('[UpdateUserBloc]: _onFirstnameChanged');
     final firstname = Firstname.dirty(event.firstname);
     emit(
       state.copyWith(
@@ -47,7 +48,7 @@ class UpdateUserBloc extends Bloc<UpdateUserEvent, UpdateUserState> {
     UpdateUserLastnameChanged event,
     Emitter<UpdateUserState> emit,
   ) {
-    print('[UpdateUserBloc]: _onLastnameChanged()');
+    print('[UpdateUserBloc]: _onLastnameChanged');
     final lastname = Lastname.dirty(event.lastname);
     emit(
       state.copyWith(
@@ -64,20 +65,19 @@ class UpdateUserBloc extends Bloc<UpdateUserEvent, UpdateUserState> {
     UpdateUserSubmitted event,
     Emitter<UpdateUserState> emit,
   ) async {
-    print('[UpdateUserBloc]: _onSubmitted()');
+    print('[UpdateUserBloc]: _onSubmitted');
     if (state.isValid) {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
 
-      try {
-        await _authenticationRepository.updateAuthenticatedUser(
-          firstname: state.firstname.value,
-          lastname: state.lastname.value,
-        );
+      final result = await _authenticationRepository.updateAuthenticatedUser(
+        firstname: state.firstname.value,
+        lastname: state.lastname.value,
+      );
 
-        emit(state.copyWith(status: FormzSubmissionStatus.success));
-      } catch (_) {
-        emit(state.copyWith(status: FormzSubmissionStatus.failure));
-      }
+      result.fold(
+        (error) => emit(state.copyWith(status: FormzSubmissionStatus.failure, error: error)),
+        (_) => emit(state.copyWith(status: FormzSubmissionStatus.success)),
+      );
     }
   }
 }

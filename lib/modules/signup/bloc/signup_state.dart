@@ -8,6 +8,7 @@ final class SignupState extends Equatable {
     this.firstname = const Firstname.pure(),
     this.lastname = const Lastname.pure(),
     this.isValid = false,
+    this.error,
   });
 
   final FormzSubmissionStatus status;
@@ -16,6 +17,7 @@ final class SignupState extends Equatable {
   final Firstname firstname;
   final Lastname lastname;
   final bool isValid;
+  final AppError? error;
 
   SignupState copyWith({
     FormzSubmissionStatus? status,
@@ -24,6 +26,7 @@ final class SignupState extends Equatable {
     Firstname? firstname,
     Lastname? lastname,
     bool? isValid,
+    AppError? error,
   }) {
     return SignupState(
       status: status ?? this.status,
@@ -32,9 +35,17 @@ final class SignupState extends Equatable {
       firstname: firstname ?? this.firstname,
       lastname: lastname ?? this.lastname,
       isValid: isValid ?? this.isValid,
+      error: error,
     );
   }
 
   @override
-  List<Object> get props => [status, email, password, firstname, lastname];
+  List<Object?> get props => [
+        status,
+        email,
+        password,
+        firstname,
+        lastname,
+        error,
+      ];
 }

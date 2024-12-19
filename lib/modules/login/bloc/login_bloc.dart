@@ -2,6 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
+import '../../../core/errors/errors.dart';
 import '../../../models/email_field_model.dart';
 import '../../../models/password_field_model.dart';
 import '../../authentication/authentication_repository.dart';
@@ -68,15 +69,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     print('[LoginBloc]: _onSubmitted()');
     if (state.isValid) {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
-      try {
-        await _authenticationRepository.login(
-          email: state.email.value,
-          password: state.password.value,
-        );
-        emit(state.copyWith(status: FormzSubmissionStatus.success));
-      } catch (_) {
-        emit(state.copyWith(status: FormzSubmissionStatus.failure));
-      }
+
+      final result = await _authenticationRepository.login(
+        email: state.email.value,
+        password: state.password.value,
+      );
+
+      result.fold(
+        (error) => emit(state.copyWith(status: FormzSubmissionStatus.failure, error: error)),
+        (_) => emit(state.copyWith(status: FormzSubmissionStatus.success)),
+      );
     }
   }
 }

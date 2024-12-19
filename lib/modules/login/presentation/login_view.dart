@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 
+import '../../../main.dart';
 import '../../authentication/authentication_repository.dart';
+import '../../signup/presentation/signup_view.dart';
 import '../bloc/login_bloc.dart';
 
 class LoginView extends StatelessWidget {
@@ -35,11 +37,11 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocListener<LoginBloc, LoginState>(
       listener: (context, state) {
-        if (state.status.isFailure) {
+        if (state.status.isFailure && state.error != null) {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              const SnackBar(content: Text('Authentication Failure')),
+              SnackBar(content: Text(state.error!.message)),
             );
         }
       },
@@ -53,6 +55,8 @@ class LoginForm extends StatelessWidget {
             _PasswordInput(),
             const Padding(padding: EdgeInsets.all(12)),
             _LoginButton(),
+            const Padding(padding: EdgeInsets.all(12)),
+            _SignupRedirectionButton(),
           ],
         ),
       ),
@@ -116,6 +120,19 @@ class _LoginButton extends StatelessWidget {
       key: const Key('loginForm_continue_raisedButton'),
       onPressed: isValid ? () => context.read<LoginBloc>().add(const LoginSubmitted()) : null,
       child: const Text('Login'),
+    );
+  }
+}
+
+class _SignupRedirectionButton extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () => navigatorKey.currentState?.pushAndRemoveUntil<void>(
+        SignupView.route(),
+        (route) => false,
+      ),
+      child: const Text('Sign up'),
     );
   }
 }

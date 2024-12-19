@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'main.dart';
 import 'modules/authentication/authentication_repository.dart';
 import 'modules/authentication/bloc/authentication_bloc.dart';
 import 'modules/authentication/datasources/authentication_datasource.dart';
@@ -18,10 +19,6 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   late final AuthenticationRepository _authenticationRepository;
-
-  final _navigatorKey = GlobalKey<NavigatorState>();
-
-  NavigatorState get _navigator => _navigatorKey.currentState!;
 
   @override
   void initState() {
@@ -48,7 +45,7 @@ class _MainAppState extends State<MainApp> {
           authenticationRepository: _authenticationRepository,
         )..add(AuthenticationSubscriptionRequested()),
         child: MaterialApp(
-          navigatorKey: _navigatorKey,
+          navigatorKey: navigatorKey,
           builder: (context, child) {
             return BlocListener<AuthenticationBloc, AuthenticationState>(
               // Avoid redirection when overriding authenticated user on user update
@@ -56,12 +53,12 @@ class _MainAppState extends State<MainApp> {
               listener: (context, state) {
                 switch (state.status) {
                   case AuthenticationStatus.authenticated:
-                    _navigator.pushAndRemoveUntil<void>(
+                    navigatorKey.currentState?.pushAndRemoveUntil<void>(
                       HomeView.route(),
                       (route) => false,
                     );
                   case AuthenticationStatus.unauthenticated:
-                    _navigator.pushAndRemoveUntil<void>(
+                    navigatorKey.currentState?.pushAndRemoveUntil<void>(
                       LoginView.route(),
                       (route) => false,
                     );

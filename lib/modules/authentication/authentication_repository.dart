@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../core/errors/errors.dart';
+import '../../core/helpers/either.dart';
 import '../../models/user_model.dart';
 import 'datasources/authentication_datasource.dart';
 import 'datasources/shared_preferences_datasource.dart';
@@ -35,7 +37,7 @@ class AuthenticationRepository {
   /// It first yields the initial status and then listens to status changes.
   Stream<AuthenticationStatus> get status async* {
     if (kDebugMode) {
-      print('[AuthenticationRepository]: status stream accessed');
+      print('[AuthenticationRepository]: status');
     }
     yield AuthenticationStatus.initial;
     yield* _controller.stream;
@@ -46,7 +48,7 @@ class AuthenticationRepository {
   /// - Returns `null` if no token is found.
   Future<User?> getUser() async {
     if (kDebugMode) {
-      print('[AuthenticationRepository]: getUser()');
+      print('[AuthenticationRepository]: getUser');
     }
 
     final token = await sharedPreferencesDatasource.getSessionToken();
@@ -66,12 +68,12 @@ class AuthenticationRepository {
 
   /// Logs in the user with the provided credentials and saves a session token.
   /// - Updates the authentication status to `authenticated`.
-  Future<void> login({
+  Future<Either<AppError, void>> login({
     required String email,
     required String password,
   }) async {
     if (kDebugMode) {
-      print('[AuthenticationRepository]: logIn()');
+      print('[AuthenticationRepository]: login');
     }
 
     final result = await authenticationDatasource.login(
@@ -79,28 +81,29 @@ class AuthenticationRepository {
       password: password,
     );
 
-    result.fold(
-      (error) => null,
+    return result.fold(
+      (error) => Left(error),
       (authResponse) async {
         if (authResponse.token != null) {
           await sharedPreferencesDatasource.setSessionToken(token: authResponse.token!);
 
           _controller.add(AuthenticationStatus.authenticated);
         }
+        return Right(null);
       },
     );
   }
 
   /// Create the user with the provided credentials and saves a session token.
   /// - Updates the authentication status to `authenticated`.
-  Future<void> signup({
+  Future<Either<AppError, void>> signup({
     required String email,
     required String password,
     required String firstname,
     required String lastname,
   }) async {
     if (kDebugMode) {
-      print('[AuthenticationRepository]: signup()');
+      print('[AuthenticationRepository]: signup');
     }
 
     final result = await authenticationDatasource.signup(
@@ -110,14 +113,15 @@ class AuthenticationRepository {
       lastname: lastname,
     );
 
-    result.fold(
-      (error) => null,
+    return result.fold(
+      (error) => Left(error),
       (authResponse) async {
         if (authResponse.token != null) {
           await sharedPreferencesDatasource.setSessionToken(token: authResponse.token!);
 
           _controller.add(AuthenticationStatus.authenticated);
         }
+        return Right(null);
       },
     );
   }
@@ -125,20 +129,21 @@ class AuthenticationRepository {
   /// Updates the authenticated user's information.
   /// - Simulates an API call to fetch updated user details.
   /// - Updates the authentication status to `authenticated`.
-  Future<void> updateAuthenticatedUser({
+  Future<Either<AppError, void>> updateAuthenticatedUser({
     required String firstname,
     required String lastname,
   }) async {
-    print('[AuthenticationRepository]: updateAuthenticatedUser()');
+    print('[AuthenticationRepository]: updateAuthenticatedUser');
 
     // Simulate a user update.
     final result = await authenticationDatasource.updateUser(firstname: firstname, lastname: lastname);
-    result.fold(
-      (error) => null,
+    return result.fold(
+      (error) => Left(error),
       (updatedUser) {
         _user = updatedUser;
         // This triggers the authentication bloc listener and will refresh authentication state user
         _controller.add(AuthenticationStatus.authenticated);
+        return Right(null);
       },
     );
   }
@@ -146,7 +151,7 @@ class AuthenticationRepository {
   /// Logs out the user by clearing the stored session token and updating the status.
   /// - Updates the authentication status to `unauthenticated`.
   Future<void> logOut() async {
-    print('[AuthenticationRepository]: logOut()');
+    print('[AuthenticationRepository]: logOut');
 
     // Clear the shared preferences token.
     await sharedPreferencesDatasource.clearSessionToken();
@@ -157,7 +162,7 @@ class AuthenticationRepository {
 
   /// Disposes the stream controller to free up resources.
   void dispose() {
-    print('[AuthenticationRepository]: dispose()');
+    print('[AuthenticationRepository]: dispose');
     _controller.close();
   }
 }
