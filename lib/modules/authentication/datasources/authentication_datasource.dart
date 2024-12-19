@@ -62,6 +62,32 @@ class AuthenticationDatasource {
     }
   }
 
+  Future<Either<AppError, AuthResponse>> signup({required String email, required String password}) async {
+    try {
+      if (kDebugMode) {
+        print("[AuthenticationDatasource]: signup");
+      }
+
+      // Get authenticated user based on shared preferences token
+      final response = await _service.post('auth/signup', body: {
+        "username": email,
+        "password": password,
+      });
+
+      if (response.isSuccess) {
+        return Right(AuthResponse.fromJson(response.data));
+      } else {
+        return Left(ServerError(response.message));
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+
+      return Left(const UnhandledError("Failed to sign in."));
+    }
+  }
+
   Future<Either<AppError, User>> updateUser({required String email}) async {
     try {
       if (kDebugMode) {

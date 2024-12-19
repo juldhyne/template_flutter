@@ -66,12 +66,39 @@ class AuthenticationRepository {
 
   /// Logs in the user with the provided credentials and saves a session token.
   /// - Updates the authentication status to `authenticated`.
-  Future<void> logIn({
+  Future<void> login({
     required String email,
     required String password,
   }) async {
     if (kDebugMode) {
       print('[AuthenticationRepository]: logIn()');
+    }
+
+    final result = await authenticationDatasource.login(
+      email: email,
+      password: password,
+    );
+
+    result.fold(
+      (error) => null,
+      (authResponse) async {
+        if (authResponse.token != null) {
+          await sharedPreferencesDatasource.setSessionToken(token: authResponse.token!);
+
+          _controller.add(AuthenticationStatus.authenticated);
+        }
+      },
+    );
+  }
+
+  /// Create the user with the provided credentials and saves a session token.
+  /// - Updates the authentication status to `authenticated`.
+  Future<void> signup({
+    required String email,
+    required String password,
+  }) async {
+    if (kDebugMode) {
+      print('[AuthenticationRepository]: signup()');
     }
 
     final result = await authenticationDatasource.login(
