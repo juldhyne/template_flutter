@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:template_flutter/core/const/shared_preferences.dart';
-import 'package:template_flutter/core/network/rest_api_header_model.dart';
+
+import '../const/shared_preferences.dart';
+import '../network/rest_api_header_model.dart';
 
 class HeaderManager {
   RestApiHeader _headers = const RestApiHeader(

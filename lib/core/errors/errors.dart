@@ -11,3 +11,7 @@ abstract class AppError implements Exception {
 class ServerError extends AppError {
   const ServerError(super.message);
 }
+
+class UnhandledError extends AppError {
+  const UnhandledError(super.message);
+}

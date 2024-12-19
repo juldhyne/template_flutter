@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app.dart';
 import 'core/dependencies/dependencies.dart';
 
 Future<void> main() async {
@@ -11,17 +12,28 @@ Future<void> main() async {
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
-}
+
+/**
+ * TODO:
+ * Forms
+ * Infinite Lists
+ * Redirection/Router
+ * Notifications
+ * Backend calls
+ * Errors
+ * Versions
+ * Authentication
+ * Dark mode
+ * Snackbars
+ * Images
+ * Searches
+ */
+
+
+/**
+ * Forms 
+ * Handle multi steps and multi steps validations
+ * local errors (min length, etc)
+ * server errors (email already used, etc)
+ */
