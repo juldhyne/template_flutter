@@ -2,7 +2,7 @@ import 'user_model.dart';
 
 class AuthResponse {
   bool success;
-  String message;
+  String? message;
   User? user;
   String? token;
 

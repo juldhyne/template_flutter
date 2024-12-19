@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
 
+import '../../core/dependencies/header_manager.dart';
 import '../../core/errors/errors.dart';
 import '../../core/helpers/either.dart';
 import '../../models/user_model.dart';
@@ -86,7 +88,7 @@ class AuthenticationRepository {
       (authResponse) async {
         if (authResponse.token != null) {
           await sharedPreferencesDatasource.setSessionToken(token: authResponse.token!);
-
+          GetIt.instance<HeaderManager>().updateHeaderToken(authResponse.token!);
           _controller.add(AuthenticationStatus.authenticated);
         }
         return Right(null);
@@ -118,7 +120,7 @@ class AuthenticationRepository {
       (authResponse) async {
         if (authResponse.token != null) {
           await sharedPreferencesDatasource.setSessionToken(token: authResponse.token!);
-
+          GetIt.instance<HeaderManager>().updateHeaderToken(authResponse.token!);
           _controller.add(AuthenticationStatus.authenticated);
         }
         return Right(null);
@@ -163,6 +165,7 @@ class AuthenticationRepository {
   /// Disposes the stream controller to free up resources.
   void dispose() {
     print('[AuthenticationRepository]: dispose');
+
     _controller.close();
   }
 }

@@ -33,7 +33,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     LoginEmailChanged event,
     Emitter<LoginState> emit,
   ) {
-    print('[LoginBloc]: _onEmailChanged()');
+    print('[LoginBloc]: _onEmailChanged');
     final email = Email.dirty(event.email);
     emit(
       state.copyWith(
@@ -49,7 +49,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     LoginPasswordChanged event,
     Emitter<LoginState> emit,
   ) {
-    print('[LoginBloc]: _onPasswordChanged()');
+    print('[LoginBloc]: _onPasswordChanged');
     final password = Password.dirty(event.password);
     emit(
       state.copyWith(
@@ -66,7 +66,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     LoginSubmitted event,
     Emitter<LoginState> emit,
   ) async {
-    print('[LoginBloc]: _onSubmitted()');
+    print('[LoginBloc]: _onSubmitted');
     if (state.isValid) {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
 

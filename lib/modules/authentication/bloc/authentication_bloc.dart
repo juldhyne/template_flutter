@@ -34,7 +34,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     Emitter<AuthenticationState> emit,
   ) {
     if (kDebugMode) {
-      print('[AuthenticationBloc]: _onSubscriptionRequested()');
+      print('[AuthenticationBloc]: _onSubscriptionRequested');
     }
     return emit.onEach(
       _authenticationRepository.status,
@@ -65,7 +65,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     Emitter<AuthenticationState> emit,
   ) {
     if (kDebugMode) {
-      print('[AuthenticationBloc]: _onLogoutPressed()');
+      print('[AuthenticationBloc]: _onLogoutPressed');
     }
     _authenticationRepository.logOut();
   }
@@ -74,7 +74,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   /// Returns a [User] if successful, otherwise returns `null`.
   Future<User?> _tryGetUser() async {
     if (kDebugMode) {
-      print('[AuthenticationBloc]: _tryGetUser()');
+      print('[AuthenticationBloc]: _tryGetUser');
     }
     try {
       final user = await _authenticationRepository.getUser();

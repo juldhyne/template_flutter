@@ -20,7 +20,7 @@ class RestApiHeader {
   }
 
   Map<String, String> toJson() => {
-        HttpHeaders.authorizationHeader: token,
+        HttpHeaders.authorizationHeader: "Bearer $token",
         HttpHeaders.contentTypeHeader: contentTypeHeader,
       };
 }
