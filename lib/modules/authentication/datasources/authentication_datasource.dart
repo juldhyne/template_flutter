@@ -58,11 +58,12 @@ class AuthenticationDatasource {
         print(e.toString());
       }
 
-      return Left(const UnhandledError("Failed to sign in."));
+      return Left(const UnhandledError("Failed to log in."));
     }
   }
 
-  Future<Either<AppError, AuthResponse>> signup({required String email, required String password}) async {
+  Future<Either<AppError, AuthResponse>> signup(
+      {required String email, required String password, required String firstname, required String lastname}) async {
     try {
       if (kDebugMode) {
         print("[AuthenticationDatasource]: signup");
@@ -72,6 +73,8 @@ class AuthenticationDatasource {
       final response = await _service.post('auth/signup', body: {
         "username": email,
         "password": password,
+        "firstname": firstname,
+        "lastname": lastname,
       });
 
       if (response.isSuccess) {
@@ -84,19 +87,20 @@ class AuthenticationDatasource {
         print(e.toString());
       }
 
-      return Left(const UnhandledError("Failed to sign in."));
+      return Left(const UnhandledError("Failed to sign up."));
     }
   }
 
-  Future<Either<AppError, User>> updateUser({required String email}) async {
+  Future<Either<AppError, User>> updateUser({required String firstname, required String lastname}) async {
     try {
       if (kDebugMode) {
-        print("[AuthenticationDatasource]: login");
+        print("[AuthenticationDatasource]: updateUser");
       }
 
       // Get authenticated user based on shared preferences token
       final response = await _service.post('auth/login', body: {
-        "username": email,
+        "firstname": firstname,
+        "lastname": lastname,
       });
 
       if (response.isSuccess) {
@@ -109,7 +113,7 @@ class AuthenticationDatasource {
         print(e.toString());
       }
 
-      return Left(const UnhandledError("Failed to sign in."));
+      return Left(const UnhandledError("Failed to update user."));
     }
   }
 }

@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'app.dart';
 import 'core/dependencies/dependencies.dart';
+import 'core/environments/dev.dart';
+import 'core/environments/environment.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  Environment.env = DevelopmentEnvironment();
 
   // Setup dependencies
   await setupDependencies();

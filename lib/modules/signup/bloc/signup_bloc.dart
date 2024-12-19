@@ -2,9 +2,11 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
+import '../../../models/email_field_model.dart';
+import '../../../models/firstname_field_model.dart';
+import '../../../models/lastname_field_model.dart';
+import '../../../models/password_field_model.dart';
 import '../../authentication/authentication_repository.dart';
-import '../../login/models/email_field_model.dart';
-import '../../login/models/password_field_model.dart';
 
 part 'signup_event.dart';
 part 'signup_state.dart';
@@ -20,6 +22,8 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
         super(const SignupState()) {
     on<SignupEmailChanged>(_onEmailChanged);
     on<SignupPasswordChanged>(_onPasswordChanged);
+    on<SignupFirstnameChanged>(_onFirstnameChanged);
+    on<SignupLastnameChanged>(_onLastnameChanged);
     on<SignupSubmitted>(_onSubmitted);
   }
 
@@ -37,7 +41,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     emit(
       state.copyWith(
         email: email,
-        isValid: Formz.validate([state.password, email]),
+        isValid: Formz.validate([email, state.password, state.firstname, state.lastname]),
       ),
     );
   }
@@ -53,7 +57,39 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
     emit(
       state.copyWith(
         password: password,
-        isValid: Formz.validate([password, state.email]),
+        isValid: Formz.validate([state.email, password, state.firstname, state.lastname]),
+      ),
+    );
+  }
+
+  /// Handles changes to the firstname field.
+  /// Validates the new firstname and updates the state.
+  void _onFirstnameChanged(
+    SignupFirstnameChanged event,
+    Emitter<SignupState> emit,
+  ) {
+    print('[SignupBloc]: _onFirstnameChanged()');
+    final firstname = Firstname.dirty(event.firstname);
+    emit(
+      state.copyWith(
+        firstname: firstname,
+        isValid: Formz.validate([state.email, state.password, firstname, state.lastname]),
+      ),
+    );
+  }
+
+  /// Handles changes to the lastname field.
+  /// Validates the new lastname and updates the state.
+  void _onLastnameChanged(
+    SignupLastnameChanged event,
+    Emitter<SignupState> emit,
+  ) {
+    print('[SignupBloc]: _onLastnameChanged()');
+    final lastname = Lastname.dirty(event.lastname);
+    emit(
+      state.copyWith(
+        lastname: lastname,
+        isValid: Formz.validate([state.email, state.password, state.lastname, lastname]),
       ),
     );
   }
@@ -72,6 +108,8 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
         await _authenticationRepository.signup(
           email: state.email.value,
           password: state.password.value,
+          firstname: state.firstname.value,
+          lastname: state.lastname.value,
         );
         emit(state.copyWith(status: FormzSubmissionStatus.success));
       } catch (_) {

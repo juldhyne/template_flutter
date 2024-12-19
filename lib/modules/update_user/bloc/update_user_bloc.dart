@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
+import '../../../models/firstname_field_model.dart';
+import '../../../models/lastname_field_model.dart';
 import '../../authentication/authentication_repository.dart';
 
 part 'update_user_event.dart';
@@ -15,11 +17,45 @@ class UpdateUserBloc extends Bloc<UpdateUserEvent, UpdateUserState> {
     required AuthenticationRepository authenticationRepository,
   })  : _authenticationRepository = authenticationRepository,
         super(const UpdateUserState()) {
+    on<UpdateUserFirstnameChanged>(_onFirstnameChanged);
+    on<UpdateUserLastnameChanged>(_onLastnameChanged);
     on<UpdateUserSubmitted>(_onSubmitted);
   }
 
   /// The repository used for updating the authenticated user.
   final AuthenticationRepository _authenticationRepository;
+
+  /// Handles changes to the firstname field.
+  /// Validates the new firstname and updates the state.
+  void _onFirstnameChanged(
+    UpdateUserFirstnameChanged event,
+    Emitter<UpdateUserState> emit,
+  ) {
+    print('[UpdateUserBloc]: _onFirstnameChanged()');
+    final firstname = Firstname.dirty(event.firstname);
+    emit(
+      state.copyWith(
+        firstname: firstname,
+        isValid: Formz.validate([firstname, state.lastname]),
+      ),
+    );
+  }
+
+  /// Handles changes to the lastname field.
+  /// Validates the new lastname and updates the state.
+  void _onLastnameChanged(
+    UpdateUserLastnameChanged event,
+    Emitter<UpdateUserState> emit,
+  ) {
+    print('[UpdateUserBloc]: _onLastnameChanged()');
+    final lastname = Lastname.dirty(event.lastname);
+    emit(
+      state.copyWith(
+        lastname: lastname,
+        isValid: Formz.validate([state.lastname, lastname]),
+      ),
+    );
+  }
 
   /// Handles the submission of the update user form.
   /// If the form is valid, triggers the update via [AuthenticationRepository].
@@ -33,7 +69,10 @@ class UpdateUserBloc extends Bloc<UpdateUserEvent, UpdateUserState> {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
 
       try {
-        await _authenticationRepository.updateAuthenticatedUser(username: "");
+        await _authenticationRepository.updateAuthenticatedUser(
+          firstname: state.firstname.value,
+          lastname: state.lastname.value,
+        );
 
         emit(state.copyWith(status: FormzSubmissionStatus.success));
       } catch (_) {

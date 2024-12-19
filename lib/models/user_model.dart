@@ -1,10 +1,15 @@
 class User {
   final int id;
-  final String email;
+  final String firstname;
+  final String lastname;
 
-  const User({required this.id, required this.email});
+  const User({required this.id, required this.firstname, required this.lastname});
 
   factory User.fromJson(Map<String, dynamic> json) {
-    return User(id: json['id'], email: json['email']);
+    return User(
+      id: json['id'],
+      firstname: json['firstname'],
+      lastname: json['lastname'],
+    );
   }
 }

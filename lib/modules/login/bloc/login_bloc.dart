@@ -2,9 +2,9 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 
+import '../../../models/email_field_model.dart';
+import '../../../models/password_field_model.dart';
 import '../../authentication/authentication_repository.dart';
-import '../models/email_field_model.dart';
-import '../models/password_field_model.dart';
 
 part 'login_event.dart';
 part 'login_state.dart';

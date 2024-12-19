@@ -96,14 +96,18 @@ class AuthenticationRepository {
   Future<void> signup({
     required String email,
     required String password,
+    required String firstname,
+    required String lastname,
   }) async {
     if (kDebugMode) {
       print('[AuthenticationRepository]: signup()');
     }
 
-    final result = await authenticationDatasource.login(
+    final result = await authenticationDatasource.signup(
       email: email,
       password: password,
+      firstname: firstname,
+      lastname: lastname,
     );
 
     result.fold(
@@ -122,12 +126,13 @@ class AuthenticationRepository {
   /// - Simulates an API call to fetch updated user details.
   /// - Updates the authentication status to `authenticated`.
   Future<void> updateAuthenticatedUser({
-    required String username,
+    required String firstname,
+    required String lastname,
   }) async {
     print('[AuthenticationRepository]: updateAuthenticatedUser()');
 
     // Simulate a user update.
-    final result = await authenticationDatasource.updateUser(email: username);
+    final result = await authenticationDatasource.updateUser(firstname: firstname, lastname: lastname);
     result.fold(
       (error) => null,
       (updatedUser) {
