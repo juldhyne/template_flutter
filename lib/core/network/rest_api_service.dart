@@ -28,6 +28,9 @@ class RestApiService {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
     try {
+      if (kDebugMode) {
+        print("GET: $url$route");
+      }
       final uri = Uri.parse("$url$route").replace(queryParameters: queryParams);
       final response = await http.get(uri, headers: getHeaders());
       return _checkHttpResponse(response, responseDataType);
@@ -42,6 +45,9 @@ class RestApiService {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
     try {
+      if (kDebugMode) {
+        print("POST: $url$route");
+      }
       final response = await http.post(
         Uri.parse("$url$route"),
         headers: getHeaders(),
@@ -59,6 +65,9 @@ class RestApiService {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
     try {
+      if (kDebugMode) {
+        print("PUT: $url$route");
+      }
       final response = await http.put(
         Uri.parse("$url$route"),
         headers: getHeaders(),
@@ -76,6 +85,9 @@ class RestApiService {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
     try {
+      if (kDebugMode) {
+        print("PATCH: $url$route");
+      }
       final response = await http.patch(
         Uri.parse("$url$route"),
         headers: getHeaders(),
@@ -93,6 +105,9 @@ class RestApiService {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
     try {
+      if (kDebugMode) {
+        print("DELETE: $url$route");
+      }
       final response = await http.delete(
         Uri.parse("$url$route"),
         headers: getHeaders(),
@@ -113,6 +128,9 @@ class RestApiService {
     ResponseDataTypeEnum responseDataType = ResponseDataTypeEnum.json,
   }) async {
     try {
+      if (kDebugMode) {
+        print("POST FILE: $url$route");
+      }
       final formData = d.FormData.fromMap(
         {
           'destination': destination,
