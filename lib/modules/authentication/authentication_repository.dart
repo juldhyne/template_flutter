@@ -89,6 +89,7 @@ class AuthenticationRepository {
         if (authResponse.token != null) {
           await sharedPreferencesDatasource.setSessionToken(token: authResponse.token!);
           GetIt.instance<HeaderManager>().updateHeaderToken(authResponse.token!);
+          _user = authResponse.user;
           _controller.add(AuthenticationStatus.authenticated);
         }
         return Right(null);
