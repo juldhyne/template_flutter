@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 
 import '../../../main.dart';
+import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';
 import '../../signup/presentation/signup_view.dart';
 import '../../version_checker/cubit/version_checker_cubit.dart';
@@ -17,22 +17,22 @@ class LoginView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(12),
+    return AppScaffold(
+      body: AppPadding(
+        padding: const AppEdgeInsets.all(Spacing.small),
         child: BlocProvider(
           create: (context) => LoginBloc(
             authenticationRepository: context.read<AuthenticationRepository>(),
           ),
-          child: const LoginForm(),
+          child: const _LoginForm(),
         ),
       ),
     );
   }
 }
 
-class LoginForm extends StatelessWidget {
-  const LoginForm({super.key});
+class _LoginForm extends StatelessWidget {
+  const _LoginForm({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,28 +42,27 @@ class LoginForm extends StatelessWidget {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text(state.error!.message)),
+              SnackBar(content: AppText(state.error!.message)),
             );
         }
       },
-      child: Align(
-        alignment: const Alignment(0, -1 / 3),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _EmailInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _PasswordInput(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _LoginButton(),
-            const Padding(padding: EdgeInsets.all(12)),
-            _SignupRedirectionButton(),
-            const Spacer(),
-            if (context.read<VersionCheckerCubit>().state is VersionCheckerAccepted)
-              Text(
-                  "Version ${(context.read<VersionCheckerCubit>().state as VersionCheckerAccepted).packageInfo.version}")
-          ],
-        ),
+      child: Column(
+        children: [
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _EmailInput(),
+                _PasswordInput(),
+                _LoginButton(),
+                _SignupRedirectionButton(),
+              ].separateWith(const AppGap.small()),
+            ),
+          ),
+          if (context.read<VersionCheckerCubit>().state is VersionCheckerAccepted)
+            AppText(
+                "Version ${(context.read<VersionCheckerCubit>().state as VersionCheckerAccepted).packageInfo.version}")
+        ],
       ),
     );
   }
@@ -124,7 +123,7 @@ class _LoginButton extends StatelessWidget {
     return ElevatedButton(
       key: const Key('loginForm_continue_raisedButton'),
       onPressed: isValid ? () => context.read<LoginBloc>().add(const LoginSubmitted()) : null,
-      child: const Text('Login'),
+      child: const AppText('Login'),
     );
   }
 }
@@ -137,7 +136,7 @@ class _SignupRedirectionButton extends StatelessWidget {
         SignupView.route(),
         (route) => false,
       ),
-      child: const Text('Sign up'),
+      child: const AppText('Sign up'),
     );
   }
 }

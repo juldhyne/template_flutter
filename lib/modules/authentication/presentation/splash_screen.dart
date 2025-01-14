@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import '../../../theme/theme.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -9,9 +9,9 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return const AppScaffold(
       body: Center(
-        child: Text('...'),
+        child: AppText('...'),
       ),
     );
   }

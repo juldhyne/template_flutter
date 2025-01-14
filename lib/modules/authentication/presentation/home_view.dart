@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../main.dart';
+import '../../../theme/theme.dart';
 import '../../update_user/presentation/update_user_view.dart';
 import '../bloc/authentication_bloc.dart';
 
@@ -14,15 +14,15 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return AppScaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _UserId(),
-            _UpdateUserRedirectionButton(),
-            _LogoutButton(),
-          ],
+            const _UserId(),
+            const _UpdateUserRedirectionButton(),
+            const _LogoutButton(),
+          ].separateWith(const AppGap.small()),
         ),
       ),
     );
@@ -35,7 +35,7 @@ class _UpdateUserRedirectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: const Text('Update user'),
+      child: const AppText('Update user'),
       onPressed: () => navigatorKey.currentState?.pushAndRemoveUntil<void>(
         UpdateUserView.route(),
         (route) => false,
@@ -50,7 +50,7 @@ class _LogoutButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      child: const Text('Logout'),
+      child: const AppText('Logout'),
       onPressed: () {
         context.read<AuthenticationBloc>().add(AuthenticationLogoutPressed());
       },
@@ -67,6 +67,6 @@ class _UserId extends StatelessWidget {
       (AuthenticationBloc bloc) => bloc.state.user?.id,
     );
 
-    return Text('UserID: $userId');
+    return AppText('UserID: $userId');
   }
 }

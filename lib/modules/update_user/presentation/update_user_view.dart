@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:template_flutter/modules/update_user/bloc/update_user_bloc.dart';
 
+import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';
 
 class UpdateUserView extends StatelessWidget {
@@ -14,9 +14,9 @@ class UpdateUserView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(12),
+    return AppScaffold(
+      body: AppPadding(
+        padding: const AppEdgeInsets.all(Spacing.small),
         child: BlocProvider(
           create: (context) => UpdateUserBloc(
             authenticationRepository: context.read<AuthenticationRepository>(),
@@ -39,7 +39,7 @@ class UpdateUserForm extends StatelessWidget {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text(state.error!.message)),
+              SnackBar(content: AppText(state.error!.message)),
             );
         }
       },
@@ -49,11 +49,9 @@ class UpdateUserForm extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _FirstnameInput(),
-            const Padding(padding: EdgeInsets.all(12)),
             _LastnameInput(),
-            const Padding(padding: EdgeInsets.all(12)),
             _LoginButton(),
-          ],
+          ].separateWith(const AppGap.small()),
         ),
       ),
     );
@@ -116,7 +114,7 @@ class _LoginButton extends StatelessWidget {
     return ElevatedButton(
       key: const Key('updateUserForm_continue_raisedButton'),
       onPressed: isValid ? () => context.read<UpdateUserBloc>().add(const UpdateUserSubmitted()) : null,
-      child: const Text('Update'),
+      child: const AppText('Update'),
     );
   }
 }

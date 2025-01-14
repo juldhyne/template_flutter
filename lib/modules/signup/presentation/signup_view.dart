@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:template_flutter/modules/signup/bloc/signup_bloc.dart';
 
+import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';
 
 class SignupView extends StatelessWidget {
@@ -14,9 +14,9 @@ class SignupView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(12),
+    return AppScaffold(
+      body: AppPadding(
+        padding: const AppEdgeInsets.all(Spacing.small),
         child: BlocProvider(
           create: (context) => SignupBloc(
             authenticationRepository: context.read<AuthenticationRepository>(),
@@ -39,7 +39,7 @@ class SignupForm extends StatelessWidget {
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
-              SnackBar(content: Text(state.error!.message)),
+              SnackBar(content: AppText(state.error!.message)),
             );
         }
       },
@@ -49,15 +49,11 @@ class SignupForm extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             _EmailInput(),
-            const Padding(padding: EdgeInsets.all(12)),
             _PasswordInput(),
-            const Padding(padding: EdgeInsets.all(12)),
             _FirstnameInput(),
-            const Padding(padding: EdgeInsets.all(12)),
             _LastnameInput(),
-            const Padding(padding: EdgeInsets.all(12)),
             _LoginButton(),
-          ],
+          ].separateWith(const AppGap.small()),
         ),
       ),
     );
@@ -161,7 +157,7 @@ class _LoginButton extends StatelessWidget {
     return ElevatedButton(
       key: const Key('signupForm_continue_raisedButton'),
       onPressed: isValid ? () => context.read<SignupBloc>().add(const SignupSubmitted()) : null,
-      child: const Text('Sign up'),
+      child: const AppText('Sign up'),
     );
   }
 }
