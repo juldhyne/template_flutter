@@ -4,7 +4,7 @@ import 'package:formz/formz.dart';
 import '../../../main.dart';
 import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';
-import '../../signup/presentation/signup_view.dart';
+import '../../signup_form/presentation/signup_view.dart';
 import '../../version_checker/cubit/version_checker_cubit.dart';
 import '../bloc/login_bloc.dart';
 

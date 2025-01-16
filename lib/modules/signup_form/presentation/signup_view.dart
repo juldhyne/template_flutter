@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:template_flutter/modules/signup/bloc/signup_bloc.dart';
+import 'package:template_flutter/modules/signup_form/bloc/signup_bloc.dart';
 
 import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
-import 'package:template_flutter/modules/update_user/bloc/update_user_bloc.dart';
+import 'package:template_flutter/modules/update_user_form/bloc/update_user_bloc.dart';
 
 import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';
