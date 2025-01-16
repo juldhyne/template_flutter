@@ -7,7 +7,7 @@ import 'modules/authentication/datasources/authentication_datasource.dart';
 import 'modules/authentication/datasources/shared_preferences_datasource.dart';
 import 'modules/authentication/presentation/home_view.dart';
 import 'modules/authentication/presentation/splash_screen.dart';
-import 'modules/login/presentation/login_view.dart';
+import 'modules/login_form/presentation/login_view.dart';
 import 'modules/version_checker/cubit/version_checker_cubit.dart';
 import 'modules/version_checker/datasources/version_checker_datasource.dart';
 import 'modules/version_checker/version_checker_repository.dart';

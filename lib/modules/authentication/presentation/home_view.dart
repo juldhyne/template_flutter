@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../main.dart';
 import '../../../theme/theme.dart';
-import '../../update_user/presentation/update_user_view.dart';
+import '../../update_user_form/presentation/update_user_view.dart';
 import '../bloc/authentication_bloc.dart';
 
 class HomeView extends StatelessWidget {
