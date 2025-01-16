@@ -1,10 +1,9 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../main.dart';
 import '../../../theme/theme.dart';
 import '../../authentication/authentication_repository.dart';
-import '../../signup_form/presentation/signup_view.dart';
 import '../../version_checker/cubit/version_checker_cubit.dart';
 import '../bloc/login_bloc.dart';
 
@@ -132,10 +131,7 @@ class _SignupRedirectionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () => navigatorKey.currentState?.pushAndRemoveUntil<void>(
-        SignupView.route(),
-        (route) => false,
-      ),
+      onPressed: () => context.push('/signup'),
       child: const AppText('Sign up'),
     );
   }

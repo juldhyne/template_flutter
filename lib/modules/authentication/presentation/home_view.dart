@@ -1,8 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../main.dart';
 import '../../../theme/theme.dart';
-import '../../update_user_form/presentation/update_user_view.dart';
 import '../bloc/authentication_bloc.dart';
 
 class HomeView extends StatelessWidget {
@@ -36,10 +35,7 @@ class _UpdateUserRedirectionButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       child: const AppText('Update user'),
-      onPressed: () => navigatorKey.currentState?.pushAndRemoveUntil<void>(
-        UpdateUserView.route(),
-        (route) => false,
-      ),
+      onPressed: () => context.push('/update_user'),
     );
   }
 }

@@ -5,7 +5,7 @@ import 'core/dependencies/dependencies.dart';
 import 'core/environments/dev.dart';
 import 'core/environments/environment.dart';
 
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+// final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,9 +26,6 @@ Future<void> main() async {
  * Infinite Lists
  * Redirection/Router
  * Notifications
- * Backend calls
- * Errors
- * Dark mode
  * Snackbars
  * Images
  * Searches

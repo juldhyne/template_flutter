@@ -4,8 +4,10 @@ class AppScaffold extends StatelessWidget {
   const AppScaffold({
     super.key,
     required this.body,
+    this.bottomNavigationBar,
   });
   final Widget? body;
+  final Widget? bottomNavigationBar;
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +20,7 @@ class AppScaffold extends StatelessWidget {
       child: Scaffold(
         backgroundColor: theme.colors.backgroundColor,
         body: body,
+        bottomNavigationBar: bottomNavigationBar,
       ),
     );
   }
